@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+outputs/
+logs/
+validation_report.json
+
+*.rttm
+*.csv
+*.json

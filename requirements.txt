@@ -1,0 +1,10 @@
+# Helper dependencies for the run scripts
+tqdm>=4.66
+soundfile>=0.12
+pandas>=2.0
+huggingface_hub>=0.23
+omegaconf>=2.3
+pyyaml>=6.0
+
+# Model runtimes are installed separately because they are heavy and
+# environment-sensitive. See README.md for the exact commands.
