@@ -1,18 +1,13 @@
 # SADA diarization run scripts
 
-Run SADA diarization with:
-
-- `nvidia/diar_streaming_sortformer_4spk-v2.1`
-- `BUT-FIT/diarizen-wavlm-large-s80-md-v2`
-
-This repo is code-only. Audio data and generated outputs stay outside the repo.
+This repo contains run scripts only. It does not include SADA audio, manifests, or diarization results.
 
 ## Files
 
-- `scripts/run_sortformer_sada.py`
-- `scripts/run_diarizen_sada.py`
 - `scripts/run_sortformer.sh`
+- `scripts/run_sortformer_sada.py`
 - `scripts/run_diarizen.sh`
+- `scripts/run_diarizen_sada.py`
 - `scripts/validate_setup.py`
 - `data/sada_manifest.example.jsonl`
 
@@ -21,14 +16,15 @@ This repo is code-only. Audio data and generated outputs stay outside the repo.
 - Python 3.10+
 - `torch`
 - `soundfile`
+- helper packages from `requirements.txt`
 
-Install helper packages:
+Install the helper packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-If a model requires Hugging Face access:
+If a model needs Hugging Face access:
 
 ```bash
 export HF_TOKEN=...
@@ -40,19 +36,24 @@ or:
 huggingface-cli login
 ```
 
-## Sortformer run
+GPU is recommended for practical runtime.
 
-Inputs:
-- `input_dir` or `manifest`
-- `output_dir`
-- local `NeMo` clone path
+## Input
 
-Expected input layout:
+Use either:
 
-- if using `input_dir`, the script scans audio recursively
-- if using `manifest`, use the JSONL format shown in `data/sada_manifest.example.jsonl`
+- a folder that contains SADA audio files
+- or a JSONL manifest in the format shown in `data/sada_manifest.example.jsonl`
 
-Install NeMo and clone the repo:
+Outputs are written under the output directory you pass at run time.
+
+## Sortformer
+
+Model:
+
+- `nvidia/diar_streaming_sortformer_4spk-v2.1`
+
+You need a local NeMo clone:
 
 ```bash
 pip install "nemo-toolkit[all]"
@@ -60,16 +61,10 @@ git clone https://github.com/NVIDIA-NeMo/NeMo.git
 export NEMO_ROOT=/path/to/NeMo
 ```
 
-Streaming command:
+Folder mode:
 
 ```bash
 zsh scripts/run_sortformer.sh <input_dir> <output_dir> <nemo_root> streaming
-```
-
-Non-streaming-style command:
-
-```bash
-zsh scripts/run_sortformer.sh <input_dir> <output_dir> <nemo_root> non-streaming
 ```
 
 Manifest mode:
@@ -78,17 +73,13 @@ Manifest mode:
 zsh scripts/run_sortformer.sh <manifest.jsonl> <output_dir> <nemo_root> streaming python manifest
 ```
 
-Outputs:
-- `<output_dir>/rttm_outputs` or NeMo-produced RTTM files under the run directory
-- `<output_dir>/summary.json`
-- `<output_dir>/summary.csv`
-- `<output_dir>/logs`
+For the offline-style preset, replace `streaming` with `non-streaming`.
 
-## DiariZen run
+## DiariZen
 
-Inputs:
-- `input_dir` or `manifest`
-- `output_dir`
+Model:
+
+- `BUT-FIT/diarizen-wavlm-large-s80-md-v2`
 
 Recommended install flow:
 
@@ -111,21 +102,26 @@ Manifest mode:
 zsh scripts/run_diarizen.sh <manifest.jsonl> <output_dir> python manifest
 ```
 
-Outputs:
-- `<output_dir>/rttm_outputs/*.rttm`
-- `<output_dir>/summary.json`
-- `<output_dir>/summary.csv`
-- `<output_dir>/logs`
+## Outputs
+
+Each run writes:
+
+- `rttm_outputs/*.rttm`
+- `summary.json`
+- `summary.csv`
+- `logs/`
+
+These are raw diarization outputs.
 
 ## Validation
 
-Quick structural validation:
+Quick structural check:
 
 ```bash
 python scripts/validate_setup.py
 ```
 
-Optional stronger validation with one real audio file:
+Optional stronger check with one real audio file:
 
 ```bash
 python scripts/validate_setup.py \
@@ -139,6 +135,4 @@ This writes `validation_report.json`.
 
 - `run_sortformer_sada.py` wraps the official NeMo example inference script.
 - `run_diarizen_sada.py` expects `DiariZenPipeline.from_pretrained(...)` to be available.
-- Outputs are raw diarization outputs.
-- Some models may require GPU for practical runtime.
-- Check each model card for license restrictions. DiariZen weights are non-commercial.
+- Check each model card for license restrictions before use.

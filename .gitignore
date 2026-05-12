@@ -1,4 +1,5 @@
 __pycache__/
+**/__pycache__/
 *.pyc
 .DS_Store
 
@@ -7,5 +8,7 @@ logs/
 validation_report.json
 
 *.rttm
-*.csv
-*.json
+summary.csv
+summary.json
+dry_run.json
+data/_validate_manifest*.jsonl
